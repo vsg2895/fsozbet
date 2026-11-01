@@ -1,0 +1,186 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { getBonusCategory } from '@/lib/api'
+import { buildBreadcrumbSchema, buildItemListSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
+import { COPY } from '@/constants/copy'
+import SpecialOfferCard from '@/components/SpecialOfferCard'
+import Pagination from '@/components/Pagination'
+import { SITE_URL } from '@/lib/config'
+import { canonicalPath } from '@/lib/seo/canonical'
+
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
+
+type Props = {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<Record<string, string | undefined>>
+}
+
+/**
+ * Canonical PATH for one page of a bonus type.
+ *
+ * A path, not an absolute URL: `alternates.canonical` and `openGraph.url` are
+ * resolved against `metadataBase`, so the host is named once (lib/config) and
+ * cannot drift per page. JSON-LD needs absolute URLs, so those call sites
+ * prefix SITE_URL themselves.
+ */
+function canonicalPathFor(slug: string, page: number): string {
+  return canonicalPath(`/bonuses/${slug}`, page)
+}
+
+/*
+ * NO generateStaticParams, deliberately — the same reasoning as
+ * /categories/[slug].
+ *
+ * Next decides a dynamic route's shape from what that function RETURNS: an
+ * EMPTY list builds a fully static route, and a static render throws
+ * DYNAMIC_SERVER_USAGE because the root layout reads cookies — taking every
+ * slug down with a 500. A params lookup that fails closed to `[]` on one API
+ * blip is enough to flip the build into that shape, so the function is left out
+ * entirely and the route is pinned dynamic whatever the data does.
+ *
+ * `force-dynamic` is deliberately NOT used: it would downgrade fetchCache to
+ * no-store and send every request to the API. This keeps the per-fetch cache
+ * and its tags, so an admin edit still invalidates the page through the
+ * revalidation webhook.
+ */
+
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const sp = await searchParams
+  const page = Math.max(1, Number(sp.page) || 1)
+
+  const payload = await getBonusCategory(slug, page)
+
+  if (payload === null) {
+    return { title: COPY.errors.notFound }
+  }
+
+  const { category, offers } = payload
+  // Distinct title per page, so paginated views are never reported as
+  // duplicates of each other.
+  const title = page > 1 ? `${category.name} — Page ${page}` : category.name
+  // The type's own description when the admin wrote one; otherwise this site's
+  // line about the Bonus area, composed with the name so the sentence is still
+  // specific to this page rather than boilerplate.
+  const description = category.description ?? `${category.name} — ${COPY.bonusCategory.metaSuffix}`
+  const canonical = canonicalPathFor(slug, page)
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    /*
+     * An EMPTY bonus type is `noindex, follow`. The page renders its empty state
+     * rather than 404ing, because the nav and the sitemap list every published
+     * type; but an indexable page saying "no offers" is what Google files as a
+     * soft 404. Driven by the data: the first offer makes it indexable on the
+     * next regeneration. Past-the-end pages never get here: they 404.
+     */
+    ...(offers.length === 0 ? { robots: { index: false, follow: true } } : {}),
+    openGraph: { type: 'website', url: canonical, siteName: SITE_NAME, title, description },
+  }
+}
+
+export default async function BonusCategoryPage({ params, searchParams }: Props) {
+  const { slug } = await params
+  const sp = await searchParams
+  const page = Math.max(1, Number(sp.page) || 1)
+
+  // null covers both an unknown slug and a type the admin has switched off:
+  // neither is published, so neither has a page. An empty listing would read as
+  // "this exists and holds nothing", which is a different (and wrong) claim.
+  const payload = await getBonusCategory(slug, page)
+
+  if (payload === null) {
+    notFound()
+  }
+
+  const { category, offers, meta } = payload
+
+  /*
+   * A PAGE NUMBER PAST THE END IS NOT A PAGE.
+   *
+   * Without this, /bonuses/<type>?page=999 rendered an empty list with HTTP 200,
+   * an `index` robots tag and a self-referencing canonical, so every number a
+   * crawler guessed became its own indexable URL claiming to be a real page of
+   * the type. Google calls that a soft 404 and reports it as an error.
+   *
+   * `page > 1` is part of the test on purpose: an empty type still has a
+   * legitimate page 1, and it must render its empty state rather than 404.
+   */
+  if (page > 1 && page > meta.last_page) notFound()
+  const pageUrl = `${SITE_URL}${canonicalPathFor(slug, page)}`
+  const description = category.description ?? `${category.name} — ${COPY.bonusCategory.metaSuffix}`
+
+  // Position continues across pages, so the ItemList describes the real order
+  // of the type rather than restarting at 1 on every page.
+  const offset = (meta.current_page - 1) * meta.per_page
+  const graph = [
+    buildWebPageSchema({
+      name: category.name,
+      url: pageUrl,
+      description,
+      breadcrumbId: breadcrumbIdFor(pageUrl),
+    }),
+    buildBreadcrumbSchema(
+      [
+        { name: 'Home', url: SITE_URL },
+        { name: COPY.nav.specialOffers, url: `${SITE_URL}/special-offers` },
+        { name: category.name, url: `${SITE_URL}/bonuses/${slug}` },
+      ],
+      pageUrl,
+    ),
+    buildItemListSchema(
+      category.name,
+      pageUrl,
+      offers.map((offer, i) => ({
+        position: offset + i + 1,
+        name: offer.title,
+        url: `${SITE_URL}/special-offers/${offer.slug}`,
+      })),
+    ),
+  ]
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
+
+      {/* The same measure, grid and card as /special-offers, so arriving here
+          from a chip is that listing narrowed rather than a different page. */}
+      <main className="px-5 pb-12 pt-6 sm:pb-16 sm:pt-10">
+        <div className="mx-auto max-w-[1240px]">
+          <nav className="mb-3 text-sm sm:mb-6 text-faint">
+            <Link href="/" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Home</Link>
+            {' / '}
+            <Link href="/special-offers" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">{COPY.nav.specialOffers}</Link>
+            {' / '}
+            <span className="text-ink">{category.name}</span>
+          </nav>
+
+          <header className="mb-4 sm:mb-8">
+            <h1 className="font-display text-[26px] font-extrabold leading-[1.08] text-ink sm:text-[46px]">{category.name}</h1>
+            {category.description && <p className="mt-1 max-w-[680px] text-[15px] text-ink-soft sm:mt-2 sm:text-[17px]">{category.description}</p>}
+            {/* The count is what lets a reader trust the paginator: it says how
+                much is behind these cards. */}
+            {meta.total > 0 && (
+              <p className="mt-2 text-sm text-faint">
+                {meta.total} {meta.total === 1 ? COPY.bonusCategory.countOne : COPY.bonusCategory.countMany}
+              </p>
+            )}
+          </header>
+
+          {offers.length === 0 ? (
+            <p className="rounded-[22px] border border-dashed border-line bg-paper p-10 text-center text-muted">{COPY.specialOffers.noResults}</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+              {offers.map((offer) => <SpecialOfferCard key={offer.id} offer={offer} />)}
+            </div>
+          )}
+
+          <Pagination basePath={`/bonuses/${slug}`} current={meta.current_page} last={meta.last_page} />
+        </div>
+      </main>
+    </>
+  )
+}
