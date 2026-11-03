@@ -196,7 +196,9 @@ export const COPY = {
     // by the operator. Keep it identical to the site's "Registered address"
     // setting in the admin, which feeds the legal pages and the Organization
     // JSON-LD, and to the postal address in this site's email templates.
-    postalAddress: '27 Hazelwood Close, Leeds, West Yorkshire, LS15 8RT, United Kingdom',
+    // The postcode's space is a NO-BREAK space ( ): on a phone the line
+    // wrapped between "LS15" and "8RT", splitting one postcode over two lines.
+    postalAddress: '27 Hazelwood Close, Leeds, West Yorkshire, LS15 8RT, United Kingdom',
     disclaimer:
       'Gambling is for adults 18+ and carries real financial risk. Set deposit limits, never chase losses, and only stake what you can afford to lose.',
   },
