@@ -67,10 +67,12 @@ export default function NewsletterForm() {
       </div>
 
       <div className="w-full sm:w-auto">
-        {/* Stacks on a phone: a 48px field and a 48px button sharing a 320px
-            row leaves the field about 140px wide, which is narrower than most
-            of the addresses typed into it. */}
-        <form onSubmit={onSubmit} className="relative flex gap-2.5">
+        {/* Stacks on a narrow phone: a field and a button sharing a 320px row
+            left the field 148px wide, which is narrower than most of the
+            addresses typed into it. The comment said so before the markup
+            did — this was a plain row at every width. From 400px the row
+            gives the field 200px+, so it goes back to side by side. */}
+        <form onSubmit={onSubmit} className="relative flex flex-col gap-2.5 min-[400px]:flex-row">
 
           {/* HONEYPOT. Never shown, never focusable, never autofilled — a human
               cannot reach it, a naive bot fills every field it finds. The server
@@ -109,9 +111,15 @@ export default function NewsletterForm() {
               pointerEvents: 'none',
             }}
           />
+          {/* A placeholder is not a label: it disappears on the first keystroke
+              and screen readers do not reliably announce it. `autoComplete`
+              lets a phone offer the visitor's own address in one tap. */}
           <input
             type="email"
+            name="email"
             required
+            autoComplete="email"
+            aria-label={COPY.newsletter.placeholder}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={COPY.newsletter.placeholder}
