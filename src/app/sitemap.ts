@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { getPage, getBonusArea, getCasinos, getCategories, getSpecialOffers } from '@/lib/api'
+import { getPage, getBonusArea, getCasinos, getCategories, getCategory, getSpecialOffers } from '@/lib/api'
+import { canonicalUrl } from '@/lib/seo/canonical'
 import { SITE_URL } from '@/lib/config'
 import { TRUST_PAGE_SLUGS } from '@/constants/legalPages'
 
@@ -30,18 +31,45 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
       : []
 
-  const categoryUrls: MetadataRoute.Sitemap =
-    categoriesRes.status === 'fulfilled'
-      ? categoriesRes.value.data
-          // An empty category is noindex (see categories/[slug]), so it is not submitted.
-          .filter((c) => (c.casinos_count ?? 0) > 0)
-          .map((c) => ({
-          url: `${SITE_URL}/categories/${c.slug}`,
-          lastModified: safeDate(c.updated_at),
-          changeFrequency: 'weekly',
-          priority: 0.6,
-        }))
-      : []
+  // An empty category is noindex (see categories/[slug]), so it is not submitted.
+  const categories =
+    categoriesRes.status === 'fulfilled' ? categoriesRes.value.data.filter((c) => (c.casinos_count ?? 0) > 0) : []
+
+  const categoryUrls: MetadataRoute.Sitemap = categories.map((c) => ({
+    url: `${SITE_URL}/categories/${c.slug}`,
+    lastModified: safeDate(c.updated_at),
+    changeFrequency: 'weekly',
+    priority: 0.6,
+  }))
+
+  // Page 2+ of each category. Those views carry a self-referencing canonical,
+  // so they are indexable in their own right — but nothing linked them from
+  // the sitemap, leaving every casino past the first page discoverable only by
+  // crawling the pagination. One request per category, all cached for an hour
+  // on the same `categories` tag the listing already uses.
+  const paginatedCategoryUrls: MetadataRoute.Sitemap = (
+    await Promise.all(
+      categories.map(async (c) => {
+        try {
+          const { meta } = (await getCategory(c.slug)).data
+          const pages: MetadataRoute.Sitemap = []
+          for (let page = 2; page <= meta.last_page; page++) {
+            pages.push({
+              url: canonicalUrl(`/categories/${c.slug}`, page),
+              lastModified: safeDate(c.updated_at),
+              changeFrequency: 'weekly',
+              priority: 0.4,
+            })
+          }
+          return pages
+        } catch {
+          // A category that fails to load simply contributes no extra pages;
+          // the sitemap must still render.
+          return []
+        }
+      }),
+    )
+  ).flat()
 
   /*
    * A SITEMAP MUST NOT CONTRADICT A PAGE HEADER.
@@ -139,5 +167,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
       : []
 
-  return [...staticUrls, ...casinoUrls, ...categoryUrls, ...offerUrls, ...bonusUrls, ...legalUrls]
+  return [
+    ...staticUrls,
+    ...casinoUrls,
+    ...categoryUrls,
+    ...paginatedCategoryUrls,
+    ...offerUrls,
+    ...bonusUrls,
+    ...legalUrls,
+  ]
 }

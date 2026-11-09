@@ -58,12 +58,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // where that was most visible: six results, one headline. This site's tail
     // makes the card its own without touching the shared record.
     const shareTitle = `${title} — ${COPY.casinos.reviewTitleTail}`
+    // Share cards fell back to the site-wide generated card, so every casino
+    // shared identically. The operator's own banner (or logo) is a truthful,
+    // page-specific image and needs no extra asset.
+    const shareImage = resolveImageUrl(casino.banner_image ?? casino.image_path)
+    const images = shareImage
+      ? [{ url: shareImage, alt: `${casino.name} — reviewed by ${SITE_NAME}` }]
+      : undefined
     return {
       title,
       description,
       alternates: { canonical: `/casinos/${slug}` },
-      openGraph: { type: 'article', url: `/casinos/${slug}`, siteName: SITE_NAME, title: shareTitle, description, images: SHARE_IMAGES },
-      twitter: { card: 'summary_large_image', title: shareTitle, description, images: SHARE_IMAGES },
+      // No banner and no logo: the site card, not an image-less large card.
+      openGraph: { type: 'article', url: `/casinos/${slug}`, siteName: SITE_NAME, title: shareTitle, description, images: images ?? SHARE_IMAGES },
+      twitter: { card: 'summary_large_image', title: shareTitle, description, images: shareImage ? [shareImage] : SHARE_IMAGES },
     }
   } catch {
     return { title: COPY.errors.notFound }

@@ -2,7 +2,14 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { resolveImageUrl } from '@/lib/images'
 import { getCategories } from '@/lib/api'
-import { buildWebPageSchema, jsonLdScript, SHARE_IMAGES } from '@/lib/seo'
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  buildWebPageSchema,
+  breadcrumbIdFor,
+  jsonLdScript,
+  SHARE_IMAGES,
+} from '@/lib/seo'
 import { COPY } from '@/constants/copy'
 import { SITE_URL } from '@/lib/config'
 
@@ -21,17 +28,39 @@ export default async function CategoriesPage() {
   const res = await getCategories()
   const categories = res.data
 
-  // These listing pages carried no structured data at all. A WebPage node
-  // anchors them into the site graph so they are not read as orphans.
-  const webPage = buildWebPageSchema({
-    name: COPY.categories.pageTitle,
-    url: `${SITE_URL}/categories`,
-    description: COPY.categories.pageDescription,
-  })
+  const pageUrl = `${SITE_URL}/categories`
+  // A WebPage node anchors the page into the site graph; the breadcrumb gives
+  // it a place in the hierarchy; the ItemList describes what the page actually
+  // is — an enumeration of the categories rendered below. Without the list the
+  // page declared itself as generic prose while visibly being an index.
+  const graph = [
+    buildWebPageSchema({
+      name: COPY.categories.pageTitle,
+      url: pageUrl,
+      description: COPY.categories.pageDescription,
+      breadcrumbId: breadcrumbIdFor(pageUrl),
+    }),
+    buildBreadcrumbSchema(
+      [
+        { name: 'Home', url: SITE_URL },
+        { name: COPY.nav.categories, url: pageUrl },
+      ],
+      pageUrl,
+    ),
+    buildItemListSchema(
+      COPY.categories.pageTitle,
+      pageUrl,
+      categories.map((c, i) => ({
+        position: i + 1,
+        name: c.name,
+        url: `${SITE_URL}/categories/${c.slug}`,
+      })),
+    ),
+  ]
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(webPage) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
       <main className="px-5 pb-12 pt-6 sm:pb-16 sm:pt-10">
       <div className="mx-auto max-w-[1240px]">
         <header className="mb-4 sm:mb-8">
