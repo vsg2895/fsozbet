@@ -42,10 +42,10 @@ export default async function VerifyPage({ params }: Props) {
 
   return (
     <main className="flex min-h-[70vh] items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-line bg-paper shadow-sm">
+      <div className="w-full max-w-md overflow-hidden rounded-lg border-[1.5px] border-line bg-paper">
         <div className="bg-brand px-8 py-7 text-brand-ink">
           {ok && bonusEmailExpected && (
-            <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-brand-ink/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-ink">
+            <p className="mb-3 inline-flex items-center gap-1.5 rounded bg-brand-ink/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-ink">
               <span aria-hidden="true">✓</span> Email verified
             </p>
           )}
@@ -75,7 +75,7 @@ export default async function VerifyPage({ params }: Props) {
               {/* The site's tinted panel — the same as the bonus-figure box on
                   the offer cards. The light-theme yellow box that was here
                   sat as a bright slab in the middle of a black page. */}
-              <div className="mt-5 rounded-xl border border-brand/35 bg-brand-tint px-4 py-4">
+              <div className="mt-5 rounded-md border border-brand/35 bg-brand-tint px-4 py-4">
                 <p className="text-sm font-bold text-brand">Don&apos;t see it?</p>
                 <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-relaxed text-ink-soft marker:text-brand">
                   <li>
@@ -106,7 +106,7 @@ export default async function VerifyPage({ params }: Props) {
 
           <Link
             href="/"
-            className={`mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-brand px-5 py-2 text-sm font-bold text-brand-ink transition-colors hover:bg-brand-dark motion-reduce:transition-none ${FOCUS}`}
+            className={`mt-6 inline-flex min-h-11 items-center justify-center rounded-md bg-brand px-5 py-2 text-sm font-bold text-brand-ink transition-colors hover:bg-brand-dark motion-reduce:transition-none ${FOCUS}`}
           >
             Explore {SITE_NAME}
           </Link>

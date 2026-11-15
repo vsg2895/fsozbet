@@ -62,8 +62,8 @@ export default function NewsletterForm() {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
       <div>
-        <p className="font-display text-[17px] font-extrabold text-ink sm:text-[22px]">{COPY.newsletter.title}</p>
-        <p className="mt-0.5 text-[14.5px] text-ink-soft">{COPY.newsletter.subtitle}</p>
+        <p className="font-display text-[17px] font-extrabold text-ink">{COPY.newsletter.title}</p>
+        <p className="mt-0.5 text-[13px] text-ink-soft">{COPY.newsletter.subtitle}</p>
       </div>
 
       <div className="w-full sm:w-auto">
@@ -123,12 +123,12 @@ export default function NewsletterForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={COPY.newsletter.placeholder}
-            className="min-h-11 w-full min-w-0 flex-1 sm:min-h-12 sm:flex-none rounded-[14px] border border-line-soft bg-cream px-4 text-base text-ink placeholder:text-faint focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 sm:w-72"
+            className="min-h-11 w-full min-w-0 flex-1 sm:min-h-[46px] sm:flex-none rounded-md border-[1.5px] border-line-soft bg-cream px-3.5 text-base text-ink placeholder:text-faint focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 sm:w-72"
           />
           <button
             type="submit"
             disabled={loading}
-            className="min-h-11 shrink-0 sm:min-h-12 rounded-full px-6 text-[15px] font-bold bg-brand text-brand-ink shadow-[0_6px_18px_-8px_rgba(200,241,53,0.55)] transition-all hover:-translate-y-px hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0 disabled:opacity-60"
+            className="btn-l min-h-11 shrink-0 px-[22px] text-[15px] sm:min-h-[46px] disabled:opacity-60"
           >
             {loading ? COPY.newsletter.checking : COPY.newsletter.button}
           </button>

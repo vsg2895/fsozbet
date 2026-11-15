@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { getCategory } from '@/lib/api'
 import { buildItemListSchema, buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript, SHARE_IMAGES } from '@/lib/seo'
 import { COPY } from '@/constants/copy'
-import CasinoCard from '@/components/CasinoCard'
+import CasinoCard, { CASINO_GRID } from '@/components/CasinoCard'
 import Pagination from '@/components/Pagination'
 import { SITE_URL } from '@/lib/config'
 import { canonicalPath } from '@/lib/seo/canonical'
@@ -152,18 +152,18 @@ export default async function CategoryDetailPage({ params, searchParams }: Props
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
 
-      <main className="px-5 pb-12 pt-6 sm:pb-16 sm:pt-10">
-        <div className="mx-auto max-w-[1240px]">
+      <main className="pb-12 pt-6 sm:pb-16 sm:pt-10">
+        <div className="mx-auto max-w-[1200px] px-4">
           {/* Labelled, and the current page marked, as on the CMS pages: an
               unlabelled <nav> is announced as just "navigation". */}
-          <nav aria-label="Breadcrumb" className="mb-3 text-sm sm:mb-6 text-faint">
+          <nav aria-label="Breadcrumb" className="mb-4 font-mono text-xs text-muted sm:mb-6">
             <Link href="/" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Home</Link> / <Link href="/categories" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Categories</Link> / <span className="text-ink-soft" aria-current="page">{category.name}</span>
           </nav>
-          <h1 className="font-display text-[26px] font-extrabold leading-[1.08] text-ink sm:text-[46px]">{heading}</h1>
+          <h1 className="font-display text-[clamp(26px,8.5vw,32px)] font-extrabold leading-none text-ink [overflow-wrap:break-word] sm:text-[clamp(32px,4.6vw,56px)]">{heading}</h1>
           {casinos.length === 0 ? (
             <p className="mt-6 text-muted">{COPY.casinos.noResults}</p>
           ) : (
-            <ol className="mt-5 sm:mt-8 flex flex-col gap-4">
+            <ol className={`mt-5 sm:mt-8 ${CASINO_GRID}`}>
               {casinos.map((casino, i) => <CasinoCard key={casino.id} casino={casino} rank={offset + i + 1} />)}
             </ol>
           )}

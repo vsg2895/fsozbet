@@ -34,7 +34,7 @@ export default async function CasinoReviews({
   return (
     <section className="mt-10" aria-labelledby="player-reviews">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="player-reviews" className="font-display text-2xl font-bold text-ink">
+        <h2 id="player-reviews" className="font-display text-[26px] font-extrabold leading-tight text-ink sm:text-[clamp(26px,3vw,36px)]">
           {COPY.reviews.heading}
         </h2>
 
@@ -52,7 +52,7 @@ export default async function CasinoReviews({
       ) : (
         <ul className="mt-6 flex flex-col gap-4">
           {reviews.map((review) => (
-            <li key={review.id} className="rounded-2xl border border-line bg-paper p-5">
+            <li key={review.id} className="rounded-lg border-[1.5px] border-line bg-paper p-5">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-sm font-semibold text-gold" aria-label={`${review.rating} out of 5`}>
                   {'★'.repeat(review.rating)}

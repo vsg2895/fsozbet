@@ -31,7 +31,7 @@ export default function NotFound() {
   return (
     <main className="px-4 py-24">
       <div className="mx-auto max-w-[680px] text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand">
+        <p className="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-brand">
           404
         </p>
         <h1 className="font-display mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
@@ -46,7 +46,7 @@ export default function NotFound() {
               <li key={href}>
                 <Link
                   href={href}
-                  className="inline-flex min-h-11 items-center rounded-full border border-line-soft px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-ink"
+                  className="inline-flex min-h-11 items-center rounded-md border-[1.5px] border-line-soft px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-brand"
                 >
                   {label}
                 </Link>

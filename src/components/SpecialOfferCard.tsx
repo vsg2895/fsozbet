@@ -1,112 +1,158 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { resolveImageUrl } from '@/lib/images'
-import OfferBanner from '@/components/OfferBanner'
 import type { SpecialOffer } from '@shared/types/specialOffer'
 
 /**
- * The bonus type whose cards carry a Claim button.
+ * The bonus type whose offers carry a Claim button.
  *
  * WHY A TYPE AND NOT THE LINK. Claim used to appear on any offer that happened
- * to carry an affiliate URL, which made the card's primary action a property of
- * the data rather than an editorial decision: filing a bonus under "Free Spins"
+ * to carry an affiliate URL, which made the primary action a property of the
+ * data rather than an editorial decision: filing a bonus under "Free Spins"
  * or "Cashback" still produced a Claim button, because those offers have links
  * too. Claim now means one thing — this is a Special Offer — and whether the
  * offer has a link of its own no longer decides it.
  */
 export const CLAIMABLE_BONUS_CATEGORY = 'special-offers'
 
-// fsozbet design (BetPulseHQ structure): a graphite panel on the black ground, with the banner
-// full-bleed across the top, the operator named above the offer, and the bonus
-// figure stated in the brand colour — the mockup's `.bonusbar`, at card size.
-export default function SpecialOfferCard({ offer }: { offer: SpecialOffer }) {
-  // Full-bleed banner across the top of the card (prefer the wide banner image).
-  const preview = resolveImageUrl(offer.banner_image ?? offer.image_path)
+/** What the first column names: the casino (listings) or the bonus type (a casino's own page). */
+type Lead = 'casino' | 'type'
+
+/** Up to two initials, for a casino with no logo artwork. */
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+}
+
+const TH = 'px-[18px] py-3.5 text-left font-mono text-[11.5px] font-medium uppercase tracking-[0.08em] text-muted'
+
+/**
+ * The offers table — `.tbox` in sites/fsozbet-redesign.html: casino (or bonus
+ * type), offer, bonus and the way in, one offer per row. Below `md` the header
+ * row is dropped and every row becomes a stacked card, so nothing scrolls
+ * sideways on a phone.
+ */
+export function OfferTable({
+  offers,
+  lead = 'casino',
+  logo,
+  claim = true,
+  caption,
+}: {
+  offers: SpecialOffer[]
+  lead?: Lead
+  logo?: string | null
+  claim?: boolean
+  caption?: string
+}) {
+  if (offers.length === 0) return null
+
+  return (
+    <div className="overflow-hidden rounded-lg border-[1.5px] border-line">
+      <table className="w-full border-collapse">
+        {caption && <caption className="sr-only">{caption}</caption>}
+        <thead className="bg-paper max-md:hidden">
+          <tr className="border-b border-line">
+            <th scope="col" className={TH}>{lead === 'casino' ? 'Casino' : 'Type'}</th>
+            <th scope="col" className={TH}>Offer</th>
+            <th scope="col" className={TH}>{lead === 'casino' ? 'Bonus' : 'Details'}</th>
+            <th scope="col" className={TH}><span className="sr-only">Action</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {offers.map((offer) => (
+            <SpecialOfferCard key={offer.id} offer={offer} lead={lead} logo={logo} claim={claim} />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+/**
+ * One offer as a row of the offers table: whose it is, its name (the link to
+ * its page), the amount in lime, and the action.
+ *
+ * Claim belongs to the Special Offers bonus type and to nothing else:
+ *   Special Offers + link   →  Claim → the casino (the title is the way to the
+ *                              details)
+ *   Special Offers, NO link →  Claim → the offer's own page
+ *   any other bonus type    →  "Details →"
+ *
+ * `logo` lets a casino page pass its own logo: the offers it lists arrive
+ * without their casino attached. `claim={false}` is that page's list, which
+ * has only ever led to each offer's own page — never straight to the casino.
+ */
+export default function SpecialOfferCard({
+  offer,
+  lead = 'casino',
+  logo: logoOverride,
+  claim = true,
+}: {
+  offer: SpecialOffer
+  lead?: Lead
+  logo?: string | null
+  claim?: boolean
+}) {
+  const logo = logoOverride ?? resolveImageUrl(offer.casino?.image_path ?? offer.image_path)
+  const casinoName = offer.casino?.name ?? ''
+  const href = `/special-offers/${offer.slug}`
 
   // Claim is a property of the bonus TYPE, not of whether a link happens
   // to be filled in. See CLAIMABLE_BONUS_CATEGORY.
   const claimable = offer.bonus_category_slug === CLAIMABLE_BONUS_CATEGORY
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-[22px] border border-line bg-paper transition-[box-shadow,border-color] duration-200 hover:border-line-soft hover:shadow-[0_14px_30px_-20px_rgba(0,0,0,0.6)]">
-      {/* The banner is shown whole, on the backdrop every bonus block shares
-          — see OfferBanner. The box keeps its 16:9 shape so a grid of cards
-          stays a grid whatever ratio the artwork came in at, and the backdrop
-          renders even when a bonus has no artwork yet. */}
-      <Link href={`/special-offers/${offer.slug}`} className="relative block aspect-video overflow-hidden bg-cream">
-        <OfferBanner
-          src={preview}
-          alt={offer.title}
-          sizes="(max-width: 768px) 100vw, 400px"
-          zoomOnHover
-          /* The BONUS figure only — never the title as a stand-in. The
-             title is printed as a heading a few lines below, and setting it
-             on the banner as well made the same sentence appear twice in one
-             card. An offer with no bonus figure gets the bare ground, which
-             is the honest answer: there is nothing else to show. */
-          fallbackText={offer.bonuses}
-        />
-      </Link>
-      <div className="flex flex-1 flex-col gap-3 p-6">
-        {/* WHOSE bonus this is, above its name.
-        The title says what the offer gives; a card in a grid of twenty does
-        not say who gives it, which is the first thing someone comparing
-        offers needs. Bold and in the brand accent so it reads as a byline
-        rather than a second heading competing with the title below.
-        Rendered only when the casino is loaded — the relation is eager
-        loaded on every endpoint that feeds these cards, and a card without
-        it simply omits the line rather than printing a blank. */}
-        {offer.casino?.name && (
-          <p className="text-[13px] font-bold uppercase tracking-[0.12em] text-win">
-            {offer.casino.name}
-          </p>
-        )}
-        <h3 className="font-display text-[19px] font-bold leading-tight text-ink">{offer.title}</h3>
-        {offer.bonuses && (
-          <p className="rounded-xl border border-brand/35 bg-brand-tint px-4 py-3 text-[15.5px] font-bold text-brand">
-            {offer.bonuses}
-          </p>
-        )}
-        <span
-          className="text-[16px] leading-none tracking-[2px] text-gold"
-          role="img"
-          aria-label={`${offer.rating} out of 5`}
-        >
-          {'★'.repeat(offer.rating)}
-          <span className="text-star-empty" aria-hidden>
-            {'★'.repeat(5 - offer.rating)}
+    <tr className="border-b border-line transition-colors last:border-b-0 hover:bg-surface max-md:grid max-md:grid-cols-[minmax(0,1fr)_auto] max-md:items-center max-md:gap-x-3 max-md:gap-y-1.5 max-md:p-4">
+      <td className="px-[18px] py-3.5 align-middle max-md:col-span-2 max-md:p-0">
+        {lead === 'casino' ? (
+          <span className="flex items-center gap-3 font-bold text-ink">
+            <span aria-hidden className="flex h-9 w-12 shrink-0 items-center justify-center overflow-hidden rounded bg-white p-1 text-[11px] font-extrabold text-brand-ink">
+              {logo ? (
+                <Image src={logo} alt="" width={96} height={72} sizes="48px" className="h-full w-full object-contain" />
+              ) : (
+                initials(casinoName || offer.title)
+              )}
+            </span>
+            <span className="min-w-0 [overflow-wrap:anywhere]">{casinoName}</span>
           </span>
-        </span>
-        <div className="mt-auto flex gap-2.5 pt-2">
-          {/*
-            * Claim belongs to the Special Offers bonus type and to nothing else.
-            *
-            * Three states, and the middle one is why this is not just
-            * `offer.affiliate_url &&`:
-            *
-            *   Special Offers + link   →  Details · Claim → the casino
-            *   Special Offers, NO link →  Claim alone, leading to the offer's own
-            *                              page, where the terms and the operator
-            *                              are. One button rather than two to the
-            *                              same place.
-            *   any other bonus type    →  Details alone. A Free Spins or Cashback
-            *                              card is a link to a write-up, not a
-            *                              call to action.
-            */}
-          {!(claimable && !offer.affiliate_url) && (
-            <Link href={`/special-offers/${offer.slug}`} className="flex min-h-[46px] flex-1 items-center justify-center rounded-full border border-line-soft bg-transparent px-3 text-center text-[15px] font-bold text-ink transition-colors hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">Details</Link>
-          )}
-          {claimable && (
-            offer.affiliate_url ? (
-              <a href={offer.affiliate_url} target="_blank" rel="nofollow sponsored noopener" className="flex min-h-[46px] flex-1 items-center justify-center rounded-full bg-brand px-3 text-center text-[15px] font-bold text-brand-ink shadow-[0_6px_18px_-8px_rgba(200,241,53,0.55)] transition-all hover:-translate-y-px hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0">Claim</a>
-            ) : (
-              // No affiliate URL of its own: the offer's page is the only place that
-              // can actually lead to the operator, so Claim goes there rather than
-              // nowhere. An internal link, so no sponsored rel.
-              <Link href={`/special-offers/${offer.slug}`} className="flex min-h-[46px] flex-1 items-center justify-center rounded-full bg-brand px-3 text-center text-[15px] font-bold text-brand-ink shadow-[0_6px_18px_-8px_rgba(200,241,53,0.55)] transition-all hover:-translate-y-px hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0">Claim</Link>
-            )
-          )}
-        </div>
-      </div>
-    </article>
+        ) : (
+          offer.bonus_category_name && (
+            <span className="font-mono text-xs uppercase text-muted">{offer.bonus_category_name}</span>
+          )
+        )}
+      </td>
+      <td className="px-[18px] py-3.5 align-middle max-md:col-span-2 max-md:p-0">
+        <Link href={href} className="-my-3 inline-block py-3 font-bold text-ink [overflow-wrap:anywhere] hover:text-brand max-md:-my-2 max-md:py-2">
+          {offer.title}
+        </Link>
+      </td>
+      <td className="px-[18px] py-3.5 align-middle font-display font-bold text-brand [overflow-wrap:anywhere] max-md:p-0">
+        {offer.bonuses}
+      </td>
+      <td className="px-[18px] py-3.5 text-right align-middle max-md:p-0">
+        {claim && claimable ? (
+          offer.affiliate_url ? (
+            <a href={offer.affiliate_url} target="_blank" rel="nofollow sponsored noopener" className="btn-l min-h-11 whitespace-nowrap px-4 text-sm">
+              Claim
+            </a>
+          ) : (
+            // No affiliate URL of its own: the offer's page is the only place
+            // that can lead to the operator. An internal link, so no sponsored rel.
+            <Link href={href} className="btn-l min-h-11 whitespace-nowrap px-4 text-sm">
+              Claim
+            </Link>
+          )
+        ) : (
+          <Link href={href} className="btn-o min-h-11 whitespace-nowrap px-3.5 text-sm hover:bg-brand hover:text-brand-ink">
+            {lead === 'casino' ? 'Details' : 'View offer'}<span className="sr-only"> — {offer.title}</span> <span aria-hidden>→</span>
+          </Link>
+        )}
+      </td>
+    </tr>
   )
 }

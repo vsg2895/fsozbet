@@ -4,18 +4,15 @@ import { resolveImageUrl } from '@/lib/images'
 import { COPY } from '@/constants/copy'
 import type { CasinoWithAttachment } from '@shared/types/casino'
 
-/** How many region chips a card shows before collapsing the rest into a count. */
-const REGIONS_SHOWN = 3
-
 function Stars({ rating }: { rating: number }) {
   // `Math.round` rather than a partial star: the ratings are whole or half
-  // numbers and a half-filled glyph at 18px reads as a rendering fault. The
-  // exact figure is printed beside it either way.
+  // numbers and a half-filled glyph at this size reads as a rendering fault.
+  // The exact figure is printed beside it either way.
   const filled = Math.round(rating)
 
   return (
     <span
-      className="inline-flex items-center tracking-[2px] text-[18px] leading-none"
+      className="inline-flex items-center tracking-[1px] text-[15px] leading-none"
       role="img"
       aria-label={`${rating} out of 5`}
     >
@@ -28,29 +25,20 @@ function Stars({ rating }: { rating: number }) {
   )
 }
 
+/** The grid the cards sit in — the mockup's `.cgrid`: two across, one below 980px. */
+export const CASINO_GRID = 'grid grid-cols-1 gap-4 min-[61.25rem]:grid-cols-2'
+
 /**
- * BetPulseHQ — the ranked row.
+ * A casino as a card — `.cc` in sites/fsozbet-redesign.html: the logo on a
+ * white plate at the left, then the name and rating with the first region it
+ * accepts, the headline offer under a mono label, and the two actions. Hover
+ * or keyboard focus lifts the card and draws a lime rule along its bottom edge
+ * (globals.css). Below 640px the logo moves above the text.
  *
- * Three columns on desktop: the operator's logo at a size you
- * can actually recognise, the reading itself (name · rating · bonus · regions),
- * and the two actions. Taken from `.ccard` in sites/betpulsehq.html.
- *
- * ── Why a grid and not a flex row ───────────────────────────────────────────
- *
- * Because the logo column has to be the SAME WIDTH on every row. Operator logos
- * arrive at wildly different aspect ratios, and under `flex` each row sized its
- * own logo box to its own artwork — so a list of seven casinos had seven
- * different left edges on the text beside it. A grid track fixes the column
- * once for the whole list.
- *
- * ── What this card does NOT show ────────────────────────────────────────────
- *
- * The mockup gives each row an "Avg. payout time" chip and a pulse score out of
- * five. Neither has a column behind it on a site configured like this one, and
- * inventing a withdrawal time per operator would be the single most damaging
- * thing this page could do — it is the number a reader would act on. The chips
- * carry `countries` instead, which is real, attached per casino, and the same
- * fact the mockup's green chips were showing.
+ * NO RANK. The mockup prints "#01", "#02"… under each logo; the network rule
+ * is that no casino card shows a rank — the `<ol>` order is the ranking.
+ * `rank` is still accepted so callers did not have to change. The chip is
+ * real attached data (`countries`), with a count for the rest.
  */
 export default function CasinoCard({
   casino,
@@ -58,116 +46,63 @@ export default function CasinoCard({
   casino: CasinoWithAttachment
   rank?: number
 }) {
-  // Card shows the casino's "Image" (logo), NOT the wide "Banner Image" (that's
-  // used big on the single casino page). Falls back to the banner if no Image.
+  // The casino's "Image" (logo), NOT the wide "Banner Image" used big on the
+  // casino page. Falls back to the banner if there is no Image.
   const image = resolveImageUrl(casino.image_path ?? casino.banner_image)
 
   const regions = casino.countries ?? []
-  const shownRegions = regions.slice(0, REGIONS_SHOWN)
-  const extraRegions = regions.length - shownRegions.length
+  const firstRegion = regions[0]
 
   return (
-    <li
-      className="
-        grid items-center gap-x-5 gap-y-4 rounded-[22px] border border-line bg-paper p-[18px]
-        transition-[box-shadow,border-color] duration-200
-        hover:border-line-soft hover:shadow-[0_14px_30px_-20px_rgba(0,0,0,0.6)]
-        [grid-template-areas:'logo''info''act'] [grid-template-columns:1fr]
-        md:gap-x-6 md:p-[22px] md:[grid-template-areas:'logo_info''act_act'] md:[grid-template-columns:140px_1fr]
-        lg:[grid-template-areas:'logo_info_act'] lg:[grid-template-columns:180px_1fr_auto] lg:p-6
-      "
-    >
-
-      {/* The logo plate. Fixed height, contained artwork, so a tall logo and a
-          wide one occupy the same box and the rows stay aligned.
-
-          WHITE, not `cream`. Operator logos arrive as artwork with their own
-          white ground baked in, so on a plate of any other colour the artwork's
-          own square shows through as a hard white rectangle floating inside the
-          tile — which is exactly how it looked on the dark brands, where
-          `cream` is a deep green or plum. A white plate lets the logo's ground
-          merge with it, and the result is the single rounded card
-          partnerplaypro has always shown.
-
-          It is a LITERAL white rather than a token on purpose: this surface
-          belongs to the logo, not to the theme, so it must stay white on a
-          brand whose palette inverts. When there is no artwork the operator's
-          NAME fills the plate instead. */}
-      <div className="flex h-[90px] items-center justify-center overflow-hidden rounded-xl border border-line bg-white p-2.5 [grid-area:logo] lg:h-[110px]">
+    <li className="cc relative grid grid-cols-1 items-start gap-3.5 rounded-lg border-[1.5px] border-line bg-paper p-5 sm:grid-cols-[120px_minmax(0,1fr)] sm:gap-5">
+      {/* The logo plate. WHITE: operator logos arrive with their own white
+          ground baked in. The image fills the plate (contained), so a small
+          logo file is never drawn smaller than its box. */}
+      <div className="flex h-[72px] w-[104px] items-center justify-center overflow-hidden rounded-md bg-white p-2 sm:h-[84px] sm:w-[120px]">
         {image ? (
-          <Image
-            src={image}
-            alt={`${casino.name} logo`}
-            width={360}
-            height={220}
-            sizes="180px"
-            className="max-h-[70px] w-auto lg:max-h-[90px]"
-            style={{ objectFit: 'contain' }}
-          />
+          <Image src={image} alt={`${casino.name} logo`} width={240} height={168} sizes="120px" className="h-full w-full object-contain" />
         ) : (
-          <span className="font-display text-center text-[15px] font-extrabold leading-tight tracking-[-0.02em] text-brand-ink [overflow-wrap:anywhere] lg:text-[19px]">
-            {casino.name}
-          </span>
+          <span className="text-center text-sm font-extrabold text-brand-ink [overflow-wrap:anywhere]">{casino.name}</span>
         )}
       </div>
 
-      <div className="min-w-0 [grid-area:info]">
-        <h3 className="font-display text-[21px] font-bold leading-tight text-ink lg:text-[26px]">
-          {casino.name}
-        </h3>
-
-        <div className="my-1.5 flex items-center gap-2">
-          <Stars rating={casino.rating} />
-          <span className="text-[15px] font-semibold text-muted tabular-nums">
-            {casino.rating.toFixed(1)}
-          </span>
+      <div className="flex min-w-0 flex-col">
+        <div className="flex items-start justify-between gap-2.5">
+          <div className="min-w-0">
+            <h3 className="font-display text-[clamp(20px,6.6vw,24px)] font-extrabold leading-[1.05] text-ink [overflow-wrap:anywhere]">{casino.name}</h3>
+            <p className="mt-1.5 flex items-center gap-2 text-[13px] font-semibold text-ink-soft">
+              <Stars rating={casino.rating} />
+              <span className="tabular-nums">{casino.rating.toFixed(1)}</span>
+            </p>
+          </div>
+          {firstRegion && (
+            <span className="shrink-0 rounded border border-line-soft px-2 py-[3px] font-mono text-[11px] text-ink-soft">
+              {firstRegion.name}
+              {regions.length > 1 && <> +{regions.length - 1}<span className="sr-only"> more regions</span></>}
+            </span>
+          )}
         </div>
 
         {casino.bonuses && (
-          <p className="line-clamp-2 text-[16px] font-bold text-brand lg:text-[17.5px]">
+          <p className="mt-3.5 font-display text-[19px] font-bold leading-[1.35] text-ink [overflow-wrap:anywhere]">
+            <span className="mb-1 block font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{COPY.casinos.headlineOffer}</span>
             {casino.bonuses}
           </p>
         )}
 
-        {shownRegions.length > 0 && (
-          <ul className="mt-2.5 flex flex-wrap gap-2">
-            {shownRegions.map((country) => (
-              <li
-                key={country.id}
-                className="inline-flex items-center rounded-full bg-win-bg px-[11px] py-1 text-[13px] font-semibold text-win"
-              >
-                {country.name}
-              </li>
-            ))}
-            {extraRegions > 0 && (
-              /* A count, not a tooltip: the full list is on the review page,
-                 and a hover affordance would be invisible on a phone. */
-              <li className="inline-flex items-center rounded-full bg-surface px-[11px] py-1 text-[13px] font-semibold text-ink-soft">
-                +{extraRegions} more
-              </li>
-            )}
-          </ul>
-        )}
-      </div>
-
-      {/* Actions. Stacked in their own column on a wide card, side by side when
-          the card is mid-width, full width on a phone — so neither button ever
-          has to wrap its label. */}
-      <div className="grid gap-2.5 [grid-area:act] md:grid-cols-2 lg:min-w-[220px] lg:grid-cols-1">
-        <a
-          href={casino.attachment.affiliate_url}
-          target="_blank"
-          rel="nofollow sponsored noopener"
-          className="inline-flex min-h-[46px] items-center justify-center rounded-full bg-brand px-6 text-center text-[15px] font-bold text-brand-ink shadow-[0_6px_18px_-8px_rgba(200,241,53,0.55)] transition-all hover:-translate-y-px hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0"
-        >
-          {COPY.casinos.visitCasino}
-        </a>
-        <Link
-          href={`/casinos/${casino.slug}`}
-          className="inline-flex min-h-[46px] items-center justify-center rounded-full border border-line-soft bg-transparent px-6 text-center text-[15px] font-bold text-ink transition-colors hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-          {COPY.casinos.readReview}
-        </Link>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <a
+            href={casino.attachment.affiliate_url}
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            className="btn-l min-h-11 px-3 text-sm"
+          >
+            {COPY.casinos.visitCasino}
+          </a>
+          <Link href={`/casinos/${casino.slug}`} className="btn-o min-h-11 px-3 text-sm">
+            {COPY.casinos.readReview}
+          </Link>
+        </div>
       </div>
     </li>
   )

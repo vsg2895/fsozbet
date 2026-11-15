@@ -70,12 +70,19 @@ export const COPY = {
      */
     bonusTypesTitle: 'Spins By Bonus Type',
     heroEyebrow: 'Lime-rated spin offers',
-    // Split in two so the JSX keeps its emphasised highlight while the words
-    // change. The highlight is the brand's own phrase.
+    // Split in three so the JSX can lay the highlighter over the one word the
+    // brand turns on — "checked" — while the words around it stay plain.
     heroHeadline: 'Free spins,',
-    heroHighlight: 'checked for real value',
+    heroHighlight: 'checked',
+    heroTail: 'for real value',
     heroSubtitle:
       'A big headline number means little until you see the wagering, max-bet rule and cashout cap. We claim each offer, play it through, and rate what’s left.',
+    // The mono labels over each home section — the mockup's `// ranking`.
+    rankingLabel: '// ranking',
+    indexLabel: '// index',
+    methodLabel: '// method',
+    offersLabel: '// offers',
+    faqLabel: '// faq',
     topCasinosTitle: 'Top Spin Casinos',
     topCasinosSubtitle: 'Ranked by what their spin offers are really worth. Filter by category.',
     featuredCasinos: 'Browse rankings',
@@ -92,21 +99,25 @@ export const COPY = {
     // decoration; numbering this one is information.
     methodTitle: 'How we test a spin offer',
     methodSubtitle: 'Three steps, the same for every casino on the list.',
+    // `no` and `verb` label the step's tab; `title` and `body` fill its panel.
     methodSteps: [
       {
-        kicker: '01 — Claim',
+        no: '01',
+        verb: 'Claim',
         title: 'Claim the spins',
         body:
           'A fresh account, opened the way any new player would, and the offer claimed exactly as advertised — including anything bundled into signup.',
       },
       {
-        kicker: '02 — Spin',
+        no: '02',
+        verb: 'Spin',
         title: 'Play the wagering',
         body:
           'Spin value, eligible games, max-bet rule and the multiplier — all checked against the terms page, not the promo banner.',
       },
       {
-        kicker: '03 — Cash out',
+        no: '03',
+        verb: 'Cash out',
         title: 'Take the winnings out',
         body:
           'What the cap allows, what verification needs, and which payout methods really work. If you can’t withdraw, it’s worth nothing.',
@@ -126,6 +137,11 @@ export const COPY = {
     reviewTitleTail: 'Spin Offer Review',
     reviewSignature: 'Spin value, wagering and cashout cap read from the terms.',
     reviewSummary: 'rated on what its spin offers are worth after the wagering, the max-bet rule and the cashout cap.',
+    // The mono label over the bonus on a casino card. "Headline", not
+    // "Welcome": the field is whatever the operator leads with.
+    headlineOffer: 'Headline offer',
+    // H2 over the other casinos at the foot of a casino page.
+    moreHeading: 'More top spin casinos',
     visitCasino: 'Play Now',
     readReview: 'Read Review',
     rating: 'Spin rating',
@@ -202,6 +218,9 @@ export const COPY = {
     // The postcode's space is a NO-BREAK space ( ): on a phone the line
     // wrapped between "NG5" and "3JL", splitting one postcode over two lines.
     postalAddress: '48 Meadowfield Drive, Nottingham, NG5 3JL, United Kingdom',
+    // The footer's claim → spin → cash-out line: the method, in three words.
+    stepsLabel: 'How every offer is tested',
+    steps: ['claim', 'spin', 'cash out'],
     disclaimer:
       'Gambling is for adults 18+ and carries real financial risk. Set deposit limits, never chase losses, and only stake what you can afford to lose.',
   },

@@ -1,16 +1,14 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* fsozbet — near-black ground, graphite panels, one acid-lime accent.
-   Palette and type lifted from sites/fsozbet.html.
-   Fonts: Manrope (body) + Bricolage Grotesque (display) + JetBrains Mono
-   (eyebrows and the logo tagline).
+/* fsozbet — "the highlighter", from sites/fsozbet-redesign.html: near-black,
+   sharp corners, and a lime marker over the terms that decide what a spin
+   offer is worth. Fonts: Manrope (body), Schibsted Grotesk (display), IBM Plex
+   Mono (labels, the terminal index, the small print).
 
    TOKEN NAMES are identical to the sibling sites (cream/paper/ink/brand/…) so
-   every shared component works here unchanged — only the values differ. The
-   structure is BetPulseHQ's; this site is its DARK re-theme, so where that
-   site uses `bg-ink` as a dark ground this one uses `night` (see below):
-   here `ink` is the light text colour and would paint a dark band white. */
+   every shared component works here unchanged — only the values differ. On
+   this dark site `ink` is the LIGHT text colour; dark grounds use `night`. */
 :root {
   --background: #0c0e11;
   --foreground: #eef0e8;
@@ -20,72 +18,61 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* `cream` is the page, `paper` a raised panel, `surface` a tile or chip
-     inside a panel. On a dark ground the ladder runs LIGHTER as it rises. */
+  /* `cream` is the page, `paper` a raised panel (the mockup's --bg2),
+     `surface` a panel on hover or a tile inside one (--panel), `raise` the
+     step above that (--panel2). On a dark ground the ladder runs LIGHTER. */
   --color-cream: #0c0e11;
-  --color-paper: #14171c;
-  --color-surface: #1d2128;
+  --color-paper: #111419;
+  --color-surface: #161a20;
+  --color-raise: #1c2128;
 
-  /* Off-white with a hint of green, not pure white: beside the lime a true
-     white reads as a second accent. */
+  /* The mockup's --fg / --fg2 / --mute. `faint` is the same grey as `muted`:
+     anything darker than #7f857c drops under 4.5:1 on the panels. */
   --color-ink: #eef0e8;
-  --color-ink-soft: #d4d8dd;
-  --color-muted: #9aa1ab;
-  --color-faint: #7d8590;
+  --color-ink-soft: #b4b9ae;
+  --color-muted: #8b9187;
+  --color-faint: #8b9187;
 
-  /* Acid lime. `brand-ink` is the text that goes ON it — the page black,
-     which clears 13:1 against #c8f135; white on lime does not clear 2:1. */
-  --color-brand: #c8f135;
-  /* The pressed / hover step and the bonus text on the tint below. A DEEPER
-     lime rather than the mockup's lighter hover, so `text-brand-dark` stays a
-     readable foreground on the dark tint as well as a button state. */
-  --color-brand-dark: #b4dc22;
-  /* Used as a FOREGROUND by shared components (`text-brand-soft`) and as a
-     gradient stop: the mockup's pale hover lime. */
-  --color-brand-soft: #e2ff7a;
-  /* The bonus bar's ground: lime at ~8% on the page black. Background only. */
-  --color-brand-tint: #171c10;
-  --color-brand-ink: #0c0e11;
+  /* Lime. `brand-ink` is the text that goes ON it (the mockup's --ink) —
+     white on lime does not clear 2:1. `brand-dark` is the pressed step,
+     `brand-soft` the mockup's pale hover lime. */
+  --color-brand: #c6f135;
+  --color-brand-dark: #a9d41b;
+  --color-brand-soft: #ddfb7a;
+  /* Lime at 12% on the page black (--lime-t), as a solid colour. Background only. */
+  --color-brand-tint: #1f2714;
+  --color-brand-ink: #16181c;
 
-  /* The secondary action colour — the active filter pill, the icon tiles,
-     the focus ring. The mockup spends lime on these too, so `accent` IS the
-     lime, with black on top. */
-  --color-accent: #c8f135;
-  --color-accent-dark: #b4dc22;
-  --color-accent-ink: #0c0e11;
+  /* The mockup spends lime on the active filter, the focus ring and the
+     stepper too, so `accent` IS the lime, with black on top. */
+  --color-accent: #c6f135;
+  --color-accent-dark: #a9d41b;
+  --color-accent-ink: #16181c;
 
-  --color-line: #232830;
-  --color-line-soft: #2f353e;
+  --color-line: #252a32;
+  --color-line-soft: #323843;
 
-  /* ── The night sub-palette ────────────────────────────────────────────────
-     The deepest grounds: the footer (#090b0d), the newsletter band and the
-     banner wells. `night` itself is a BACKGROUND — it replaces BetPulseHQ's
-     `bg-ink`, which on this site would be the light text colour. */
-  --color-night: #090b0d;
-  --color-night-band: #12151a;
-  --color-night-ink: #d4d8dd;
-  --color-night-muted: #9aa1ab;
-  --color-night-faint: #7d8590;
-  --color-night-line: #1c2026;
-  --color-night-accent: #c8f135;
+  /* The deepest grounds: the footer (#08090b) and the preview strip. */
+  --color-night: #08090b;
+  --color-night-band: #111419;
+  --color-night-ink: #b4b9ae;
+  --color-night-muted: #8b9187;
+  --color-night-faint: #8b9187;
+  --color-night-line: #252a32;
+  --color-night-accent: #c6f135;
 
-  /* Stars are lime in the mockup, not gold: the site has one colour. */
-  --color-gold: #c8f135;
-  /* The UNFILLED star. Not `line-soft`, which BetPulseHQ's stars use: on this
-     black ground that is a 1.5:1 grey, so a 3/5 rating read as three stars
-     and nothing else. This clears 3:1 against both the page and the panels. */
-  --color-star-empty: #5a626e;
-  /* The factual chips (accepted regions, bonus terms): neutral graphite, so
-     the only coloured thing in a row is the offer itself. */
-  --color-win: #d4d8dd;
-  --color-win-bg: #1d2128;
+  /* Stars are lime in the mockup: the site has one colour. */
+  --color-gold: #c6f135;
+  /* The UNFILLED star: clears 3:1 against the page and the panels, so a 3/5
+     rating does not read as three stars and nothing else. */
+  --color-star-empty: #5a6158;
+  /* The factual chips (accepted regions, bonus types): neutral, outlined. */
+  --color-win: #b4b9ae;
+  --color-win-bg: #161a20;
 
   --font-sans: var(--font-manrope);
-  --font-display: var(--font-bricolage);
-  --font-mono: var(--font-jetbrains);
-
-  /* 22px panels, pills fully round — the mockup's geometry. */
-  --radius-bp: 22px;
+  --font-display: var(--font-schibsted);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
@@ -96,39 +83,160 @@ body {
 }
 
 .font-display {
-  font-family: var(--font-bricolage), system-ui, sans-serif;
-  letter-spacing: -0.03em;
+  font-family: var(--font-schibsted), system-ui, sans-serif;
+  letter-spacing: -0.025em;
 }
 
-/* ── The eyebrow dot ─────────────────────────────────────────────────────────
-   The lime dot in the hero eyebrow, glowing as in the mockup. A slow breath of
-   the glow rather than a blink; `prefers-reduced-motion` keeps the dot and its
-   static glow and drops only the motion. */
-@keyframes fz-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 6px rgba(200, 241, 53, 0.7);
-  }
-  50% {
-    box-shadow: 0 0 14px rgba(200, 241, 53, 0.95);
-  }
-}
-.pulse-dot {
-  box-shadow: 0 0 10px #c8f135;
-  animation: fz-glow 2.4s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .pulse-dot {
-    animation: none;
-  }
+/* ── The highlighter ─────────────────────────────────────────────────────────
+   The mockup's `.hl`: a lime marker stroke behind a phrase, black type on it.
+   `box-decoration-break: clone` paints every line of a wrapped phrase. */
+.hl {
+  background: linear-gradient(transparent 12%, var(--color-brand) 12%, var(--color-brand) 88%, transparent 88%);
+  color: var(--color-brand-ink);
+  padding: 0 0.15em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
-/* The hero ground: one soft lime glow from above the headline, the mockup's
-   900×520 closest-side radial. A gradient, not an image — no request. */
-.hero-wash {
+/* ── Buttons — `.btn-l` (lime) and `.btn-o` (outlined) ─────────────────────── */
+.btn-l,
+.btn-o {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 6px;
+  border: 1.5px solid transparent;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.btn-l {
+  background: var(--color-brand);
+  color: var(--color-brand-ink);
+}
+.btn-l:hover {
+  background: var(--color-brand-soft);
+}
+.btn-o {
+  border-color: var(--color-line-soft);
+  color: var(--color-ink);
+}
+.btn-o:hover {
+  border-color: var(--color-brand);
+}
+.btn-l:focus-visible,
+.btn-o:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+
+/* ── Casino card — `.cc` ──────────────────────────────────────────────────────
+   Hover or keyboard focus lifts the card, deepens its ground and draws a lime
+   rule along its bottom edge from the left. */
+.cc {
+  transition: border-color 0.2s, background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.cc::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: -1.5px;
+  height: 3px;
+  background: var(--color-brand);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s;
+}
+.cc:hover,
+.cc:focus-within {
+  border-color: var(--color-line-soft);
+  background: var(--color-surface);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px -22px rgba(198, 241, 53, 0.35);
+}
+.cc:hover::after,
+.cc:focus-within::after {
+  transform: scaleX(1);
+}
+
+/* ── Terminal index — `.tl` ───────────────────────────────────────────────────
+   A prompt, the type's slug, a dotted leader and the count. Hover marks the
+   slug with the highlighter. */
+.tl::before {
+  content: '>';
+  color: var(--color-brand);
+}
+.tl:hover {
+  background: var(--color-surface);
+}
+.tl:hover .tl-k {
+  background: var(--color-brand);
+  color: var(--color-brand-ink);
+}
+
+/* ── Method stepper ───────────────────────────────────────────────────────────
+   CSS-only: a radio per step, so all three panels are in the HTML and only the
+   checked one is displayed. Without `:has()` every panel shows. */
+.stepper:has(#step-0:checked) [data-step]:not([data-step='0']),
+.stepper:has(#step-1:checked) [data-step]:not([data-step='1']),
+.stepper:has(#step-2:checked) [data-step]:not([data-step='2']) {
+  display: none;
+}
+/* The picked step's number turns lime. */
+.stepper input:checked + label b {
+  color: var(--color-brand);
+}
+
+/* ── FAQ — `.faq` ─────────────────────────────────────────────────────────────
+   A + that turns into a −, and the open question marked in pale lime. */
+.faq summary {
+  list-style: none;
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary::after {
+  content: '+';
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 22px;
+  color: var(--color-brand);
+  text-align: center;
+}
+.faq details[open] summary::after {
+  content: '−';
+}
+.faq details[open] .faq-q {
+  background: linear-gradient(transparent 60%, rgba(198, 241, 53, 0.35) 60%);
+}
+
+/* The footer's outlined wordmark — decoration, drawn as a stroke only. */
+.word {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--color-line-soft);
+}
+
+/* The banner well where an offer or casino has no artwork of its own: a lime
+   glow over fine diagonal hatching — the mockup's `.ban`. */
+.ban {
   background:
-    radial-gradient(450px 260px at 50% -40px, rgba(200, 241, 53, 0.1), transparent),
-    var(--color-cream);
+    radial-gradient(circle at 80% 20%, rgba(198, 241, 53, 0.22), transparent 45%),
+    repeating-linear-gradient(135deg, var(--color-paper) 0 14px, var(--color-surface) 14px 15px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc,
+  .cc::after,
+  .btn-l,
+  .btn-o {
+    transition: none;
+  }
+  .cc:hover,
+  .cc:focus-within {
+    transform: none;
+  }
 }
 
 /* ── Responsive safety net (all phones / tablets / laptops / large screens) ── */
@@ -209,7 +317,7 @@ body {
 }
 .prose :where(h1, h2, h3, h4, h5, h6) {
   color: var(--color-ink);
-  font-family: var(--font-bricolage), system-ui, sans-serif;
+  font-family: var(--font-schibsted), system-ui, sans-serif;
   letter-spacing: -0.02em;
 }
 .prose :where(strong, b, th, dt) {

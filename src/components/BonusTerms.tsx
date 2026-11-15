@@ -36,10 +36,10 @@ export default function BonusTerms({ terms }: { terms: SpecialOfferTerms }) {
 
   return (
     <section
-      className="my-[30px] rounded-[22px] border border-line bg-paper p-7"
+      className="my-[30px] rounded-lg border-[1.5px] border-line bg-paper p-5 sm:p-7"
       aria-labelledby="bonus-terms"
     >
-      <h2 id="bonus-terms" className="font-display mb-5 text-[22px] font-bold text-ink">
+      <h2 id="bonus-terms" className="font-display mb-5 text-[22px] font-extrabold text-ink">
         Before you claim
       </h2>
 
@@ -47,13 +47,13 @@ export default function BonusTerms({ terms }: { terms: SpecialOfferTerms }) {
         <dl className="grid grid-cols-2 gap-5 sm:grid-cols-4">
           {rows.map(([label, value]) => (
             <div key={label}>
-              <dt className="mb-1.5 text-[12.5px] font-bold uppercase tracking-[0.16em] text-muted">
+              <dt className="mb-1.5 font-mono text-[11.5px] uppercase tracking-[0.08em] text-muted">
                 {label}
               </dt>
               {/* Tabular figures so the numbers line up between one offer and
                   the next and can be compared down a page rather than read one
                   at a time. */}
-              <dd className="text-[16.5px] font-semibold tabular-nums text-ink">{value}</dd>
+              <dd className="font-display text-[17px] font-bold tabular-nums text-ink">{value}</dd>
             </div>
           ))}
         </dl>

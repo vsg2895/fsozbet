@@ -84,19 +84,19 @@ export default function ReviewForm({ casinoSlug }: { casinoSlug: string }) {
 
   if (submitted) {
     return (
-      <div className="rounded-2xl border border-line bg-paper p-6 text-sm text-ink">
+      <div className="rounded-lg border-[1.5px] border-line bg-paper p-6 text-sm text-ink">
         {published ? COPY.reviews.success : COPY.reviews.successPending}
       </div>
     )
   }
 
-  const field = 'w-full min-h-11 rounded-xl border border-line-soft bg-paper px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-faint focus:border-brand focus:ring-2 focus:ring-brand/20'
+  const field = 'w-full min-h-11 rounded-md border-[1.5px] border-line-soft bg-paper px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-faint focus:border-brand focus:ring-2 focus:ring-brand/20'
   const label = 'mb-1 block text-xs font-semibold uppercase tracking-wide text-muted'
   const errorText = 'mt-1 text-xs text-rose-400'
 
   return (
-    <form onSubmit={onSubmit} className="rounded-2xl border border-line bg-paper p-6">
-      <h3 className="font-display text-lg font-semibold text-ink">{COPY.reviews.formTitle}</h3>
+    <form onSubmit={onSubmit} className="rounded-lg border-[1.5px] border-line bg-paper p-6">
+      <h3 className="font-display text-lg font-bold text-ink">{COPY.reviews.formTitle}</h3>
       <p className="mt-1 text-sm text-muted">{COPY.reviews.formIntro}</p>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -142,7 +142,7 @@ export default function ReviewForm({ casinoSlug }: { casinoSlug: string }) {
               aria-pressed={rating === n}
               aria-label={`${n} out of 5`}
               onClick={() => setRating(n)}
-              className={`h-11 w-11 rounded-xl border text-sm font-semibold transition-colors ${
+              className={`h-11 w-11 rounded-md border text-sm font-semibold transition-colors ${
                 rating >= n
                   ? 'border-brand bg-brand text-brand-ink'
                   : 'border-line-soft bg-paper text-faint hover:border-brand'
@@ -188,7 +188,7 @@ export default function ReviewForm({ casinoSlug }: { casinoSlug: string }) {
         {errors.body && <p className={errorText}>{errors.body}</p>}
       </div>
 
-      <button type="submit" disabled={loading} className="mt-5 min-h-[46px] rounded-xl px-6 text-[15px] font-bold bg-brand text-brand-ink shadow-[0_6px_18px_-8px_rgba(200,241,53,0.55)] transition-all hover:-translate-y-px hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60">
+      <button type="submit" disabled={loading} className="btn-l mt-5 min-h-[46px] px-6 text-[15px] disabled:opacity-60">
         {COPY.reviews.submit}
       </button>
     </form>

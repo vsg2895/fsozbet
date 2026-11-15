@@ -55,7 +55,7 @@ export default async function UnsubscribePage({ params, searchParams }: Props) {
 
   return (
     <main className="flex min-h-[70vh] items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-line bg-paper shadow-sm">
+      <div className="w-full max-w-md overflow-hidden rounded-lg border-[1.5px] border-line bg-paper">
         <div className="bg-brand px-8 py-7 text-brand-ink">
           <h1 className="text-xl font-bold">
             {!submitted
@@ -79,7 +79,7 @@ export default async function UnsubscribePage({ params, searchParams }: Props) {
                 <input type="hidden" name="token" value={token} />
                 <button
                   type="submit"
-                  className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-brand px-5 py-2 text-sm font-bold text-brand-ink transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                  className="mt-6 inline-flex min-h-11 items-center justify-center rounded-md bg-brand px-5 py-2 text-sm font-bold text-brand-ink transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                 >
                   Unsubscribe me
                 </button>
@@ -100,7 +100,7 @@ export default async function UnsubscribePage({ params, searchParams }: Props) {
 
           <Link
             href="/"
-            className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full border border-line-soft px-5 py-2 text-sm font-bold text-ink transition-colors hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            className="mt-6 inline-flex min-h-11 items-center justify-center rounded-md border-[1.5px] border-line-soft px-5 py-2 text-sm font-bold text-ink transition-colors hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             Back to homepage
           </Link>

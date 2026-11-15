@@ -61,19 +61,19 @@ export default async function CategoriesPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
-      <main className="px-5 pb-12 pt-6 sm:pb-16 sm:pt-10">
-      <div className="mx-auto max-w-[1240px]">
+      <main className="pb-12 pt-6 sm:pb-16 sm:pt-10">
+      <div className="mx-auto max-w-[1200px] px-4">
         <header className="mb-4 sm:mb-8">
-          <h1 className="font-display text-[26px] font-extrabold leading-[1.08] text-ink sm:text-[46px]">{COPY.categories.pageTitle}</h1>
+          <h1 className="font-display text-[clamp(26px,8.5vw,32px)] font-extrabold leading-none text-ink [overflow-wrap:break-word] sm:text-[clamp(32px,4.6vw,56px)]">{COPY.categories.pageTitle}</h1>
           <p className="mt-1 max-w-[680px] text-[15px] text-ink-soft sm:mt-2 sm:text-[17px]">{COPY.categories.pageDescription}</p>
         </header>
         {categories.length === 0 ? (
-          <p className="rounded-[22px] border border-dashed border-line bg-paper p-10 text-center text-muted">{COPY.categories.noResults}</p>
+          <p className="rounded-lg border border-dashed border-line bg-paper p-10 text-center text-muted">{COPY.categories.noResults}</p>
         ) : (
           <ul className="grid auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {categories.map((c) => (
               <li key={c.id}>
-                <Link href={`/categories/${c.slug}`} className="flex h-full items-center justify-center rounded-2xl border border-line bg-paper p-4 sm:p-6 text-center font-semibold text-ink shadow-sm hover:border-brand hover:text-brand transition-colors">
+                <Link href={`/categories/${c.slug}`} className="flex h-full items-center justify-center min-h-[76px] rounded-lg border-[1.5px] border-line bg-paper p-4 sm:p-6 text-center font-semibold text-ink hover:border-brand transition-colors">
                   {/* Icon beside the name, as on the chips and in the Casinos menu. */}
                   <span className="inline-flex items-center justify-center gap-2">
                     {c.logo_path && (
