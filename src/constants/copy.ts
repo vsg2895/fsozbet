@@ -182,7 +182,7 @@ export const COPY = {
   newsletter: {
     title: 'Fresh spin offers, every Friday.',
     subtitle: 'What’s new this week, what the terms really say, and which offers got quietly worse.',
-    placeholder: 'Email address',
+    placeholder: 'Email for new free-spin reads',
     button: 'Subscribe',
     // Shown while the address is being checked. The subscribe request waits on
     // a live address-validation call, so the button has to say so rather than
@@ -238,6 +238,9 @@ export const COPY = {
     ratingLabel: 'Rating',
     titleLabel: 'Headline (optional)',
     bodyLabel: 'Your report',
+    namePlaceholder: 'First name or nickname',
+    emailPlaceholder: 'you@example.com',
+    titlePlaceholder: 'One line on how the spins cleared',
     bodyPlaceholder: 'How did the spins go — wagering, max bet, cashing out?',
     submit: 'Post Report',
     // Two outcomes, because the site can run pre- or post-moderation
