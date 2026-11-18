@@ -287,7 +287,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
         {/* Footer — the mockup's `footer.ft`: the lime 18+ band, the brand and
             its claim → spin → cash-out line beside Explore / Legal /
-            Policies, the outlined wordmark, and the legal bar. */}
+            Policies, and the legal bar. */}
         <footer className="mt-14 border-t border-line bg-night">
           {/* Not `aria-hidden`: the sentence beside it never says the age, so
               a screen reader needs the "18+" too. */}
@@ -366,12 +366,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               </div>
             </div>
 
-            {/* The outlined wordmark — decoration only. */}
-            <div aria-hidden className="word mt-11 select-none overflow-hidden whitespace-nowrap font-display text-[clamp(64px,17vw,230px)] font-black leading-[0.8] tracking-[-0.06em]">
-              {SITE_NAME}
-            </div>
-
-            <div className="mt-[18px] flex flex-wrap justify-between gap-3 border-t border-line pt-[18px] font-mono text-xs text-night-muted">
+            {/* The mockup's giant outlined wordmark sat here. Removed — it is
+                decoration only, and `mt-11` is the gap it used to open above
+                the legal bar. */}
+            <div className="mt-11 flex flex-wrap justify-between gap-3 border-t border-line pt-[18px] font-mono text-xs text-night-muted">
               <p>© {new Date().getFullYear()} {SITE_NAME}. All rights reserved.</p>
               {/* Rendered only when an address exists: a freshly cloned site
                   ships with this blank, and an empty <address> is worse than

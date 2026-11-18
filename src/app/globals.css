@@ -212,12 +212,6 @@ body {
   background: linear-gradient(transparent 60%, rgba(198, 241, 53, 0.35) 60%);
 }
 
-/* The footer's outlined wordmark — decoration, drawn as a stroke only. */
-.word {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--color-line-soft);
-}
-
 /* The banner well where an offer or casino has no artwork of its own: a lime
    glow over fine diagonal hatching — the mockup's `.ban`. */
 .ban {
